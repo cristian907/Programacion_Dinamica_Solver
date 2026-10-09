@@ -1,0 +1,170 @@
+========================================================================================
+UNIVERSIDAD JOSÉ ANTONIO PÁEZ
+FACULTAD DE INGENIERÍA - ESCUELA DE COMPUTACIÓN
+MÉTODOS CUANTITATIVOS / INVESTIGACIÓN DE OPERACIONES
+MODELO DE TAMAÑO DE LA FUERZA DE TRABAJO (PROGRAMACIÓN DINÁMICA)
+========================================================================================
+Fecha de Generación: 2026-10-09 11:47:00
+
+----------------------------------------------------------------------------------------
+1. DEFINICIÓN DEL PROBLEMA Y PARÁMETROS DE ENTRADA
+----------------------------------------------------------------------------------------
+Un contratista estima la fuerza de trabajo necesaria durante las siguientes 5 semanas.
+Demandas semanales (b_i): [5, 7, 8, 4, 6]
+  • Semana 1 (b_1): 5 trabajadores
+  • Semana 2 (b_2): 7 trabajadores
+  • Semana 3 (b_3): 8 trabajadores
+  • Semana 4 (b_4): 4 trabajadores
+  • Semana 5 (b_5): 6 trabajadores
+
+Costo por excedente de mano de obra (C1): $300.00 / trabajador / semana
+Costo fijo por contratación (K):         $400.00 por evento
+Costo variable por contratación (c):     $200.00 / trabajador contratado
+Fuerza de trabajo inicial (x0):          0 trabajadores
+Cota máxima efectiva evaluada:           8 trabajadores
+
+----------------------------------------------------------------------------------------
+2. FORMULACIÓN DEL MODELO DE PROGRAMACIÓN DINÁMICA
+----------------------------------------------------------------------------------------
+• Etapas (i): Semanas del proyecto, con i = 1, 2, ..., N (N = 5 semanas).
+• Variable de Estado (x_{i-1}): Número de trabajadores disponibles de la semana anterior.
+• Variable de Decisión (x_i): Número de trabajadores empleados en la semana i actual.
+  Restricción de factibilidad: x_i >= b_i (debe cubrirse la demanda mínima).
+
+• Funciones de Costo Inmediato:
+  - Costo de mano de obra excedente: C_exceso(x_i) = C1 * (x_i - b_i)
+  - Costo de contratación:           C_contr(x_{i-1}, x_i) = K + c*(x_i - x_{i-1}) si x_i > x_{i-1}, sino 0
+  - Costo de etapa:                  g_i(x_{i-1}, x_i) = C_exceso(x_i) + C_contr(x_{i-1}, x_i)
+
+• Ecuación Recursiva de Bellman (Hacia Atrás):
+  f_i(x_{i-1}) = min { g_i(x_{i-1}, x_i) + f_{i+1}(x_i) } para x_i >= b_i
+  Condición de frontera: f_{N+1}(x_N) = 0
+
+----------------------------------------------------------------------------------------
+3. DESARROLLO PASO A PASO POR ETAPAS (RECURSIÓN HACIA ATRÁS)
+----------------------------------------------------------------------------------------
+
+>>> ETAPA 5 (SEMANA 5) - Demanda Requerida b_5 = 6 trabajadores
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+x_{4}  |  x_5  | Exceso | C_Exceso  | Contr. |  C_Contr  |  C_Etapa  |   f_{6}   |   Total   | Óptimo?
+------------------------------------------------------------------------------------------------------
+  4    |   6   |   0    | $      0 |   2    | $    800 | $    800 | $      0 | $    800 |   ***  
+  4    |   7   |   1    | $    300 |   3    | $   1000 | $   1300 | $      0 | $   1300 |        
+  4    |   8   |   2    | $    600 |   4    | $   1200 | $   1800 | $      0 | $   1800 |        
+------------------------------------------------------------------------------------------------------
+  5    |   6   |   0    | $      0 |   1    | $    600 | $    600 | $      0 | $    600 |   ***  
+  5    |   7   |   1    | $    300 |   2    | $    800 | $   1100 | $      0 | $   1100 |        
+  5    |   8   |   2    | $    600 |   3    | $   1000 | $   1600 | $      0 | $   1600 |        
+------------------------------------------------------------------------------------------------------
+  6    |   6   |   0    | $      0 |   0    | $      0 | $      0 | $      0 | $      0 |   ***  
+  6    |   7   |   1    | $    300 |   1    | $    600 | $    900 | $      0 | $    900 |        
+  6    |   8   |   2    | $    600 |   2    | $    800 | $   1400 | $      0 | $   1400 |        
+------------------------------------------------------------------------------------------------------
+  7    |   6   |   0    | $      0 |   0    | $      0 | $      0 | $      0 | $      0 |   ***  
+  7    |   7   |   1    | $    300 |   0    | $      0 | $    300 | $      0 | $    300 |        
+  7    |   8   |   2    | $    600 |   1    | $    600 | $   1200 | $      0 | $   1200 |        
+------------------------------------------------------------------------------------------------------
+  8    |   6   |   0    | $      0 |   0    | $      0 | $      0 | $      0 | $      0 |   ***  
+  8    |   7   |   1    | $    300 |   0    | $      0 | $    300 | $      0 | $    300 |        
+  8    |   8   |   2    | $    600 |   0    | $      0 | $    600 | $      0 | $    600 |        
+------------------------------------------------------------------------------------------------------
+Resumen de Óptimos para Etapa 5:
+  • Si x_4 =  4  ===>  x_5* = [6] con Costo Mínimo f_5(4) = $800.00
+  • Si x_4 =  5  ===>  x_5* = [6] con Costo Mínimo f_5(5) = $600.00
+  • Si x_4 =  6  ===>  x_5* = [6] con Costo Mínimo f_5(6) = $0.00
+  • Si x_4 =  7  ===>  x_5* = [6] con Costo Mínimo f_5(7) = $0.00
+  • Si x_4 =  8  ===>  x_5* = [6] con Costo Mínimo f_5(8) = $0.00
+
+
+>>> ETAPA 4 (SEMANA 4) - Demanda Requerida b_4 = 4 trabajadores
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+x_{3}  |  x_4  | Exceso | C_Exceso  | Contr. |  C_Contr  |  C_Etapa  |   f_{5}   |   Total   | Óptimo?
+------------------------------------------------------------------------------------------------------
+  8    |   4   |   0    | $      0 |   0    | $      0 | $      0 | $    800 | $    800 |        
+  8    |   5   |   1    | $    300 |   0    | $      0 | $    300 | $    600 | $    900 |        
+  8    |   6   |   2    | $    600 |   0    | $      0 | $    600 | $      0 | $    600 |   ***  
+  8    |   7   |   3    | $    900 |   0    | $      0 | $    900 | $      0 | $    900 |        
+  8    |   8   |   4    | $   1200 |   0    | $      0 | $   1200 | $      0 | $   1200 |        
+------------------------------------------------------------------------------------------------------
+Resumen de Óptimos para Etapa 4:
+  • Si x_3 =  8  ===>  x_4* = [6] con Costo Mínimo f_4(8) = $600.00
+
+
+>>> ETAPA 3 (SEMANA 3) - Demanda Requerida b_3 = 8 trabajadores
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+x_{2}  |  x_3  | Exceso | C_Exceso  | Contr. |  C_Contr  |  C_Etapa  |   f_{4}   |   Total   | Óptimo?
+------------------------------------------------------------------------------------------------------
+  7    |   8   |   0    | $      0 |   1    | $    600 | $    600 | $    600 | $   1200 |   ***  
+------------------------------------------------------------------------------------------------------
+  8    |   8   |   0    | $      0 |   0    | $      0 | $      0 | $    600 | $    600 |   ***  
+------------------------------------------------------------------------------------------------------
+Resumen de Óptimos para Etapa 3:
+  • Si x_2 =  7  ===>  x_3* = [8] con Costo Mínimo f_3(7) = $1,200.00
+  • Si x_2 =  8  ===>  x_3* = [8] con Costo Mínimo f_3(8) = $600.00
+
+
+>>> ETAPA 2 (SEMANA 2) - Demanda Requerida b_2 = 7 trabajadores
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+x_{1}  |  x_2  | Exceso | C_Exceso  | Contr. |  C_Contr  |  C_Etapa  |   f_{3}   |   Total   | Óptimo?
+------------------------------------------------------------------------------------------------------
+  5    |   7   |   0    | $      0 |   2    | $    800 | $    800 | $   1200 | $   2000 |        
+  5    |   8   |   1    | $    300 |   3    | $   1000 | $   1300 | $    600 | $   1900 |   ***  
+------------------------------------------------------------------------------------------------------
+  6    |   7   |   0    | $      0 |   1    | $    600 | $    600 | $   1200 | $   1800 |        
+  6    |   8   |   1    | $    300 |   2    | $    800 | $   1100 | $    600 | $   1700 |   ***  
+------------------------------------------------------------------------------------------------------
+  7    |   7   |   0    | $      0 |   0    | $      0 | $      0 | $   1200 | $   1200 |   ***  
+  7    |   8   |   1    | $    300 |   1    | $    600 | $    900 | $    600 | $   1500 |        
+------------------------------------------------------------------------------------------------------
+  8    |   7   |   0    | $      0 |   0    | $      0 | $      0 | $   1200 | $   1200 |        
+  8    |   8   |   1    | $    300 |   0    | $      0 | $    300 | $    600 | $    900 |   ***  
+------------------------------------------------------------------------------------------------------
+Resumen de Óptimos para Etapa 2:
+  • Si x_1 =  5  ===>  x_2* = [8] con Costo Mínimo f_2(5) = $1,900.00
+  • Si x_1 =  6  ===>  x_2* = [8] con Costo Mínimo f_2(6) = $1,700.00
+  • Si x_1 =  7  ===>  x_2* = [7] con Costo Mínimo f_2(7) = $1,200.00
+  • Si x_1 =  8  ===>  x_2* = [8] con Costo Mínimo f_2(8) = $900.00
+
+
+>>> ETAPA 1 (SEMANA 1) - Demanda Requerida b_1 = 5 trabajadores
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+x_{0}  |  x_1  | Exceso | C_Exceso  | Contr. |  C_Contr  |  C_Etapa  |   f_{2}   |   Total   | Óptimo?
+------------------------------------------------------------------------------------------------------
+  0    |   5   |   0    | $      0 |   5    | $   1400 | $   1400 | $   1900 | $   3300 |   ***  
+  0    |   6   |   1    | $    300 |   6    | $   1600 | $   1900 | $   1700 | $   3600 |        
+  0    |   7   |   2    | $    600 |   7    | $   1800 | $   2400 | $   1200 | $   3600 |        
+  0    |   8   |   3    | $    900 |   8    | $   2000 | $   2900 | $    900 | $   3800 |        
+------------------------------------------------------------------------------------------------------
+Resumen de Óptimos para Etapa 1:
+  • Si x_0 =  0  ===>  x_1* = [5] con Costo Mínimo f_1(0) = $3,300.00
+
+========================================================================================
+4. POLÍTICA Y PLAN DE FUERZA DE TRABAJO ÓPTIMO (TRAYECTORIA FINAL)
+========================================================================================
+Semana  | Demanda | Disp.(x_{i-1}) | Asign.(x_i*) | Contratados | Excedente | C.Contrat  |  C.Exced  | C.Semanal  | C.Acumulado
+-------------------------------------------------------------------------------------------------------------------------------
+   1    |    5    |       0       |      5       |      5      |     0     | $ 1400.00 | $   0.00 | $ 1400.00 | $  1400.00
+   2    |    7    |       5       |      8       |      3      |     1     | $ 1000.00 | $ 300.00 | $ 1300.00 | $  2700.00
+   3    |    8    |       8       |      8       |      0      |     0     | $    0.00 | $   0.00 | $    0.00 | $  2700.00
+   4    |    4    |       8       |      6       |      0      |     2     | $    0.00 | $ 600.00 | $  600.00 | $  3300.00
+   5    |    6    |       6       |      6       |      0      |     0     | $    0.00 | $   0.00 | $    0.00 | $  3300.00
+-------------------------------------------------------------------------------------------------------------------------------
+
+COSTO TOTAL MÍNIMO DE LA OPERACIÓN: $3,300.00
+
+----------------------------------------------------------------------------------------
+5. ANÁLISIS Y CONCLUSIONES GERENCIALES
+----------------------------------------------------------------------------------------
+• En la Semana 1: Se parte con 0 trabajadores y se contratan 5 para cubrir la demanda b_1 = 5.
+  Costo: Fijo $400 + (5 * $200) = $1,400.
+• En la Semana 2: La demanda sube a 7, pero la política óptima contrata 3 trabajadores adicionales
+  elevando la plantilla a 8 (cubriendo la demanda máxima de la semana 3 por adelantado).
+  Esto evita incurrir nuevamente en el costo fijo de contratación ($400) en la semana 3,
+  compensando con creces el costo de retener 1 trabajador en exceso ($300) en la semana 2.
+• En la Semana 3: Se mantienen los 8 trabajadores sin nuevas contrataciones ni excedentes (Costo = $0).
+• En la Semana 4: La demanda cae a 4. El contratista reduce la fuerza laboral a 6 (no a 4),
+  conservando 2 trabajadores excedentes (Costo = 2 * $300 = $600). Esta decisión previene
+  tener que re-contratar en la Semana 5 cuando la demanda vuelva a subir a 6 (ahorrando $800 de contratación).
+• En la Semana 5: Se mantienen exactamente los 6 trabajadores requeridos (Costo = $0).
+• Total acumulado óptimo: $3,300.00.
+========================================================================================

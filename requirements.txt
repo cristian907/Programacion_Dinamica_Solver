@@ -1,0 +1,4 @@
+customtkinter>=6.0.0
+matplotlib>=3.10.0
+pillow>=11.0.0
+pytest>=8.0.0
