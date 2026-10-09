@@ -2,9 +2,7 @@
 
 **Universidad José Antonio Páez**  
 **Facultad de Ingeniería — Escuela de Computación**  
-**Asignatura:** Métodos Cuantitativos / Investigación de Operaciones  
-**Evaluación:** Modelo de tamaño de la fuerza de trabajo (3 ptos)
-
+**Asignatura:** Métodos Cuantitativos
 ---
 
 ## 📌 1. Descripción del Problema
@@ -39,12 +37,21 @@ El modelo se descompone en 5 etapas secuenciales siguiendo el **Principio de Opt
 ### Funciones de Costo Inmediato
 
 1. **Costo de Excedente:**
+
 $$C_{\text{exceso}}(x_i) = 300 \cdot (x_i - b_i)$$
 
 2. **Costo de Contratación:**
-$$C_{\text{contr}}(x_{i-1}, x_i) = \begin{cases} 400 + 200 \cdot (x_i - x_{i-1}) & \text{si } x_i > x_{i-1} \\ 0 & \text{si } x_i \le x_{i-1} \end{cases}$$
+
+* Si se contrata nuevo personal ($x_i > x_{i-1}$):
+
+$$C_{\text{contr}}(x_{i-1}, x_i) = 400 + 200 \cdot (x_i - x_{i-1})$$
+
+* Si no hay contrataciones ($x_i \le x_{i-1}$):
+
+$$C_{\text{contr}}(x_{i-1}, x_i) = 0$$
 
 3. **Costo Directo de la Etapa:**
+
 $$g_i(x_{i-1}, x_i) = C_{\text{exceso}}(x_i) + C_{\text{contr}}(x_{i-1}, x_i)$$
 
 ### Ecuación Recursiva de Bellman (Hacia Atrás)
