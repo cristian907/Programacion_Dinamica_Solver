@@ -154,3 +154,4 @@ De acuerdo con la **Pauta 2** del enunciado (*«Subir las salidas del programa e
 4. **Tablas paso a paso de cada etapa (Etapas 5, 4, 3, 2 y 1)** con evaluación de excesos, contrataciones, costos inmediatos y costos futuros.
 5. Cuadro resumen de la trayectoria y política óptima semana a semana.
 6. Justificación gerencial del plan adoptado.
+# Programacion_Dinamica_Solver
